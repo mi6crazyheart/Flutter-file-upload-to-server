@@ -1,16 +1,41 @@
-# flutter_experiment
+# Upload files from your flutter app to server
 
-A new Flutter application.
+This is a simple flutter project for, how to upload files from your flutter app to your backend server.
 
-## Getting Started
+Youtube explanation video: https://youtu.be/YCNDR2sY4xI
 
-This project is a starting point for a Flutter application.
+## Server side - saveFile.php
 
-A few resources to get you started if this is your first Flutter project:
+    <?php
+    error_reporting(E_ERROR | E_PARSE);
 
-- [Lab: Write your first Flutter app](https://flutter.io/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.io/docs/cookbook)
+    // Response object structure
+    $response = new stdClass;
+    $response->status = null;
+    $response->message = null;
 
-For help getting started with Flutter, view our 
-[online documentation](https://flutter.io/docs), which offers tutorials, 
-samples, guidance on mobile development, and a full API reference.
+    // Uploading file
+    $destination_dir = "upload/";
+    $base_filename = basename($_FILES["file"]["name"]);
+    $target_file = $destination_dir . $base_filename;
+
+    if(!$_FILES["file"]["error"])
+    {
+        if (move_uploaded_file($_FILES["file"]["tmp_name"], $target_file)) {        
+            $response->status = true;
+            $response->message = "File uploaded successfully";
+
+        } else {
+
+            $response->status = false;
+            $response->message = "File uploading failed";
+        }    
+    } 
+    else
+    {
+        $response->status = false;
+        $response->message = "File uploading failed";
+    }
+
+    header('Content-Type: application/json');
+    echo json_encode($response);
